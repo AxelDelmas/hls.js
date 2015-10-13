@@ -54,7 +54,8 @@ class Hls {
       fpsDroppedMonitoringThreshold: 0.2,
       appendErrorMaxRetry: 200,
       loader: XhrLoader,
-      abrController : AbrController
+      abrController : AbrController,
+      maxLiveLatency: 120
     };
     for (var prop in configDefault) {
         if (prop in config) { continue; }

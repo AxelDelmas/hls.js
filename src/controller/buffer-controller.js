@@ -199,13 +199,13 @@ class BufferController {
             break;
           }
           // find fragment index, contiguous with end of buffer position
-          let fragments = levelDetails.fragments, frag, sliding = levelDetails.sliding, start = fragments[0].start + sliding, drift = 0;
+          let fragments = levelDetails.fragments, frag, sliding = levelDetails.sliding, start = fragments[0].start + sliding, drift = 0, liveEdge = fragments[fragments.length-1].start + fragments[fragments.length-1].duration + sliding;
           // check if requested position is within seekable boundaries :
           // in case of live playlist we need to ensure that requested position is not located before playlist start
           //logger.log(`start/pos/bufEnd/seeking:${start.toFixed(3)}/${pos.toFixed(3)}/${bufferEnd.toFixed(3)}/${this.video.seeking}`);
-          if (bufferEnd < start) {
+          if (bufferEnd < start || (levelDetails.live && liveEdge - this.video.currentTime > this.config.maxLiveLatency)) {
               this.seekAfterStalling = this.startPosition + sliding;
-              logger.log(`buffer end: ${bufferEnd} is located before start of live sliding playlist, media position will be reseted to: ${this.seekAfterStalling.toFixed(3)}`);
+              logger.log(`buffer end: ${bufferEnd} is located too far from live edge (-${liveEdge - this.video.currentTime}s), media position will be reseted to: ${this.seekAfterStalling.toFixed(3)}`);
               bufferEnd = this.seekAfterStalling;
           }
           if (levelDetails.live && levelDetails.sliding === undefined) {
